@@ -1,0 +1,25 @@
+{
+  "name": "sparrow_game_server",
+  "version": "0.0.0",
+  "description": "the server of Sparrow Game",
+  "main": "./SparrowGame/app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SparrowGame/SparrowGame_server.git"
+  },
+  "keywords": [
+    "game"
+  ],
+  "author": "lmzqwer2",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SparrowGame/SparrowGame_server/issues"
+  },
+  "homepage": "https://github.com/SparrowGame/SparrowGame_server#readme"
+}
