@@ -9,16 +9,40 @@ const user = require('./user.js');
 const packet = require('./packet.js');
 
 const controlBase = packet.need('type', 'status').solve(1);
-const commonActions = {
-  create_room: controlBase.solve(code.control.create_room).need('roomType'),
-  enter_room: controlBase.solve(code.control.enter_room).need('roomId'),
-  exit_room: controlBase.solve(code.control.exit_room),
-  start_game: controlBase.solve(code.control.start_game),
-}
-
-for (let key in commonActions){
-  console.log(commonActions[key].toString());
-}
+const commonActions = [
+  {
+    command: "create_room",
+    action: controlBase.solve(code.control.create_room).need('roomType'),
+    comment: "创建一个房间",
+    args: [
+      {
+        name: 'roomType',
+        comment: '房间的类型，如果未指定，则由服务器自行决定',
+      }
+    ]
+  },
+  {
+    command: "enter_room",
+    action: controlBase.solve(code.control.enter_room).need('roomId'),
+    comment: "进入一个房间",
+    args: [
+      {
+        name: 'roomId',
+        comment: '房间的id',
+      }
+    ]
+  },
+  {
+    command: "exit_room",
+    action: controlBase.solve(code.control.exit_room),
+    comment: "退出当前房间",
+  },
+  {
+    command: "start_game",
+    action: controlBase.solve(code.control.start_game),
+    comment: "开始游戏",
+  },
+]
 
 class VirtualUser extends user.User {
   constructor() {
@@ -32,29 +56,27 @@ class VirtualUser extends user.User {
     });
     let client = null;
     cli.addActions = (actions) => {
-      for (let name in actions){
-        cli.context[name] = (function(name){
-          let act = actions[name];
-          return (...rest) => {
-            self.send(act.end.apply(act, rest));
-          }
-        })(name);
-      }
+      actions.forEach((action) => {
+        let act = action.action;
+        cli.context[action.command] = (...rest) => {
+          self.send(act.end.apply(act, rest));
+        }
+      })
     }
     cli.addActions(commonActions);
     cli.defineCommand("game", {
-      help: 'load the actions of game',
+      help: '载入游戏的指令',
       action: (name) => {
-        let actions = {}
+        let actions = []
         if (game.module[name]) {
-          actions = game.module[name].actions || {};
+          actions = game.module[name].actions || [];
         }
         cli.addActions(actions);
-        this.displayPrompt();
+        cli.displayPrompt();
       }
     })
     cli.defineCommand("connect", {
-      help: "connect to server",
+      help: "连接到目标服务器，未指定url则连接本地",
       action: (url) => {
         if (!url) url = 'localhost:3000/user';
         if (!url.startsWith('ws://')) url = 'ws://' + url;
@@ -79,6 +101,38 @@ class VirtualUser extends user.User {
         ws.on('error', (e) => {
           console.log(e);
         })
+      }
+    })
+    cli.defineCommand("disconnect", {
+      help: "断开当前连接",
+      action: () => {
+        if (self.client) {
+          self.client.close();
+          client = null;
+          self.client = null;
+        }
+      }
+    })
+    cli.defineCommand("show", {
+      help: "查看游戏指令，未指定则显示共有指令",
+      action: (name) => {
+        let actions = [];
+        if (game.module[name]) {
+          actions = game.module[name].actions || [];
+        }else{
+          actions = commonActions;
+          name = '共有';
+        }
+
+        console.log(`${name}指令`)
+        actions.forEach((action) => {
+          let args = action.args || [];
+          let argNames = args.map((arg) => {
+            return arg.name;
+          })
+          console.log(`${action.command}(${argNames.join()}) ${action.comment}`);
+        })
+        cli.displayPrompt();
       }
     })
     cli.on('exit', () => super.close());

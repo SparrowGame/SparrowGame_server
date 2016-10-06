@@ -120,6 +120,7 @@ class Room {
     this.start();
   }
 }
+Room.prototype.name = 'Simple Room';
 
 const MainRoomId = 'MainRoom';
 
@@ -158,6 +159,7 @@ class MainRoom extends Room{
     for (let name in room.users) users.push(name);
     user.send(feedback.enter_room.end(0, {
       roomId: roomId,
+      roomType: room.name,
       users: users,
     }));
     room.broadcast(info.enter_room.end(user.name), [user.name]);
@@ -171,6 +173,7 @@ class MainRoom extends Room{
     if (!room){
       user.send(feedback.create_room.end(-1))
     }
+    user.send(feedback.create_room.end(0, roomId));
     this.control_enter_room(user, {
       roomId: roomId
     });
@@ -184,6 +187,7 @@ class MainRoom extends Room{
     user.send(feedback.start_game.end(-2));
   }
 }
+MainRoom.prototype.name = 'Main Room';
 
 const main = new MainRoom();
 
