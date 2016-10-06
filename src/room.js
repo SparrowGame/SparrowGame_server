@@ -49,7 +49,7 @@ class Room {
     }
     for (let name in this.users){
       if (!!exclude[name]) continue;
-      let res = obj;
+      let res = Object.assign({}, obj);
       let add = addition[name];
       if (add) {
         res = Object.assign(res, add);
@@ -82,7 +82,6 @@ class Room {
   }
 
   exchange(target, user, params) {
-    console.log("exchange");
     if (target.join(user)){
       this.leave(user)
       return true;
@@ -98,7 +97,6 @@ class Room {
   start () {}
 
   onmessage(user, act){
-    console.log('onmessage');
     let funcSet = this.funcMap[act.type] || {};
     let func = funcSet[act.status];
     if (func){

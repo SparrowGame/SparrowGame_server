@@ -52,6 +52,8 @@
 
     role 身份码 表示身份
 
+    user 身份码所对应用户
+
     暂时只有猎人在此阶段行动
 
 # step 4 游戏结束，所有人明原身份以及现身份
@@ -69,6 +71,12 @@
     current object数组，用户现身份
 
         obj格式参照origin
+
+    vote object数组，用户的投票
+
+        name 用户名
+
+        target 所投用户
 
 # role 每个身份的动作以及可能的共有动作
 
@@ -136,5 +144,11 @@
         action 0
 
             user 用户名
+
+            role 身份码
+
+    1007 兽人
+
+        action 0
 
             role 身份码

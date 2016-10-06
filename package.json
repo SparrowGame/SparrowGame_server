@@ -7,10 +7,12 @@
     "doc": "docs"
   },
   "babel": {
-	"presets": ["es2015"]
+    "presets": [
+      "es2015", "stage-3"
+    ]
   },
   "scripts": {
-	"client": "babel-node src/client.js",
+    "client": "babel-node src/client.js",
     "start": "babel-node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -41,6 +43,7 @@
     "webpack": "^1.13.2"
   },
   "dependencies": {
+    "babel-preset-stage-3": "^6.17.0",
     "bluebird": "^3.4.6",
     "express": "^4.14.0",
     "express-ws": "^2.0.0"
