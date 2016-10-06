@@ -34,13 +34,11 @@ class Room {
 
     let controlFunc = {};
     controlFunc[code.control.exit_room] = this.control_exit_room.bind(this);
+    controlFunc[code.control.start_game] = this.control_start_game.bind(this);
 
     this.funcMap[code.type.control] = controlFunc;
 
     this.admin = user;
-
-
-    if (user) this.join(user);
   }
 
   broadcast(obj, exclude={}, addition={}) {
@@ -78,8 +76,8 @@ class Room {
   }
 
   leave(user) {
-    user.removeListener('close', this.leave);
-    user.removeListener('message_obj', this.onmessage);
+    user.removeListener('close', this.bindedFunc.leave);
+    user.removeListener('message_obj', this.bindedFunc.onmessage);
     delete this.users[user.name];
   }
 
@@ -92,12 +90,18 @@ class Room {
     return false;
   }
 
+
+  start_check(params) {
+    return false;
+  }
+
+  start () {}
+
   onmessage(user, act){
     console.log('onmessage');
     let funcSet = this.funcMap[act.type] || {};
     let func = funcSet[act.status];
     if (func){
-      console.log("find");
       func(user, act);
     }
   }
@@ -106,6 +110,14 @@ class Room {
     this.exchange(main, user);
     user.send(feedback.exit_room.end(0));
     this.broadcast(info.exit_room.end(user.name));
+  }
+
+  control_start_game(user, act) {
+    if (!this.start_check(act.params)){
+      user.send(feedback.start_game.end(-1));
+      return;
+    }
+    this.start();
   }
 }
 
@@ -127,6 +139,7 @@ class MainRoom extends Room{
     controlFunc[code.control.enter_room] = this.control_enter_room.bind(this);
     controlFunc[code.control.create_room] = this.control_create_room.bind(this);
     controlFunc[code.control.exit_room] = this.control_exit_room.bind(this);
+    controlFunc[code.control.start_game] = this.control_start_game.bind(this);
   }
 
   control_enter_room(user, act){
@@ -134,10 +147,12 @@ class MainRoom extends Room{
     let room = roomSet[roomId];
     if (!room){
       user.send(feedback.enter_room.end(-1));
+      return;
     }
     let result = this.exchange(room, user, act.params);
     if (!result){
       user.send(feedback.enter_room.end(-2));
+      return;
     }
     let users = [];
     for (let name in room.users) users.push(name);
@@ -162,7 +177,11 @@ class MainRoom extends Room{
   }
 
   control_exit_room(user, act){
-    user.send(feedback.exit_room.end(-1));
+    user.send(feedback.exit_room.end(-2));
+  }
+
+  control_start_game(user, act){
+    user.send(feedback.start_game.end(-2));
   }
 }
 
