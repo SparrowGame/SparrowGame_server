@@ -26,5 +26,5 @@ app.use(express.static(`${ROOT}/public`));
 
 // 开始监听
 server.listen(port, () => {
-  console.log(`App is listening on port ${server.address().port}`);
+  console.log(`监听端口 ${server.address().port}`);
 });

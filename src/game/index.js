@@ -14,17 +14,19 @@ files.forEach((file) => {
     let gameName = path.basename(file);
     try{
       let game = require(file);
-      module[gameName] = game;
+      module[game.name] = game;
       first = game;
       size++;
+      console.log(`第 ${size} 游戏: ${game.name} - ${game.prompt}`);
     }catch (e){
-      console.log(`Can't read game names ${gameName}`, e);
+      console.log(`无法载入游戏 ${gameName}`, e);
     }
   }
 })
 
-console.assert(size > 0, "Not found any game in game folder");
-console.log(`Found ${size} games in game folder`);
+console.assert(size > 0, "在game文件夹中未找到游戏");
+console.log(`在game文件夹中找到 ${size} 个游戏`);
+console.log(`默认游戏为: ${first.name} - ${first.prompt}`);
 
 export {
   module,

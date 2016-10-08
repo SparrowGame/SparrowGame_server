@@ -23,6 +23,7 @@ const info = {
   enter_room: 1001,
   exit_room: 1002,
   start_game: 1003,
+  user_login: 1004,
 }
 
 export {

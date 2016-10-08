@@ -4,6 +4,10 @@ const events = require("events");
 
 const nameBucket = require("./nameBucket.js");
 const room = require("./room.js");
+const packet = require("./packet.js");
+const code = require("./code.js");
+const loginInfo = packet.need('type', 'status', 'name')
+                        .solve(code.type.info, code.info.user_login);
 
 class User extends events.EventEmitter {
   static onmessage(user, act){
@@ -14,9 +18,7 @@ class User extends events.EventEmitter {
     if (!room.main.join(user)){
       return user.close();
     }
-    user.send({
-      name: user.name,
-    })
+    user.send(loginInfo.end(user.name));
   }
 
   constructor() {
