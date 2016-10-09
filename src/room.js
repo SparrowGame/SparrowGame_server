@@ -114,6 +114,7 @@ class Room {
     if (func){
       func(user, act);
     }
+    this.gameMessage(user, act);
   }
 
   control_exit_room(user, act) {
@@ -178,7 +179,7 @@ class MainRoom extends Room{
   control_create_room(user, act){
     const game = require("./game");
     let roomId = MainRoom.getNewRoomId();
-    let gameModule = game.module[act.name] || game.first;
+    let gameModule = game.module[act.roomType] || game.first;
     let room = new gameModule.Room(user, roomId);
     if (!room){
       user.send(feedback.create_room.end(-1))
@@ -205,3 +206,5 @@ export {
   Room,
   main
 }
+
+require("./game");

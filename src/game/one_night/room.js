@@ -81,7 +81,6 @@ class Room extends room.Room {
       return false;
     }
     return true;
-    return super.join(user, params);
   }
 
   onleave(user) {

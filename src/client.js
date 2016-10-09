@@ -111,7 +111,7 @@ function createCommonReceiver(vu){
   }
   infoSolvers[code.info.exit_room] = (user, act) => {
     vu.log(`玩家${act.user}离开游戏`);
-    let index = vu.info.room.users.indexof(act.user);
+    let index = vu.info.room.users.indexOf(act.user);
     if (index != -1) vu.info.room.users.splice(index, 1);
   }
   infoSolvers[code.info.user_login] = (user, act) => {
@@ -161,7 +161,9 @@ function createCLI(vu){
   }
   cli.context.info = vu.info;
   cli.addActions(commonActions);
-  vu.addReceiver('common', createCommonReceiver(vu));
+  let receiver = createCommonReceiver(vu);
+  receiver.object && vu.on('message_obj', receiver.object);
+  receiver.message && vu.on('message', receiver.message);
 
   cli.defineCommand("showSend", {
     help: '显示发送的数据包',
@@ -274,13 +276,13 @@ class VirtualUser extends user.User {
     this.client.send(msg);
   }
 
-  addReceiver(name, receiver){
-    let origin = this.receiver[name];
-    if (origin){
-      this.removeListener('message_obj', origin.object);
-      this.removeListener('message', origin.object);
+  addReceiver(receiver){
+    if (this.receiver){
+      let old = this.receiver;
+      old.object && this.removeListener('message_obj', old.object);
+      old.message && this.removeListener('message', old.message);
     }
-    this.receiver[name] = receiver;
+    this.receiver = receiver;
     receiver.object && this.on('message_obj', receiver.object);
     receiver.message && this.on('message', receiver.message);
   }
@@ -325,7 +327,7 @@ class VirtualUser extends user.User {
     this.cli.addActions(actions);
     this.showActions(name);
     if (createReceiver){
-      this.addReceiver(name, createReceiver(vu));
+      this.addReceiver(createReceiver(vu));
     }
     return true;
   }

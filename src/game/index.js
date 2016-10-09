@@ -26,6 +26,7 @@ files.forEach((file) => {
 
 console.assert(size > 0, "在game文件夹中未找到游戏");
 console.log(`在game文件夹中找到 ${size} 个游戏`);
+if (module['one_night']) first = module['one_night'];
 console.log(`默认游戏为: ${first.name} - ${first.prompt}`);
 
 export {

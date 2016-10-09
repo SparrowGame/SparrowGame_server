@@ -106,7 +106,7 @@ function createReceiver(vu){
   }
   stepSolvers[code.step.afterVote] = (user, act) => {
     let message = `猎人死亡，等待猎人玩家 ${act.user} 进行行动\n`;
-    if (vu.info.user == act.user) {
+    if (vu.info.user.name == act.user) {
       message += "您是猎人，请使用 hunter_shoot 杀死一个玩家\n";
     }
     vu.log(message);
