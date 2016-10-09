@@ -29,4 +29,6 @@ class Packet {
   }
 }
 
-module.exports = new Packet();
+const empty = new Packet();
+empty.Packet = Packet;
+module.exports = empty;

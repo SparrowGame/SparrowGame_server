@@ -42,6 +42,13 @@ const commonActions = [
     action: controlBase.solve(code.control.start_game),
     comment: "开始游戏",
   },
+  {
+    command: 'send_info',
+    action: function() {
+      return {info: this.info}
+    },
+    comment: "将本地的vu.info发送给服务器，只是为了示范function类型的action",
+  }
 ]
 
 function createCommonReceiver(vu){
@@ -134,8 +141,18 @@ function createCLI(vu){
   cli.addActions = (actions) => {
     actions.forEach((action) => {
       let act = action.action;
-      cli.context[action.command] = (...rest) => {
-        vu.send(act.end.apply(act, rest));
+      let func = null;
+      if (typeof act == 'function'){
+        func = (...rest) => {
+          vu.send(act.apply(vu, rest));
+        }
+      }else if (act instanceof packet.Packet){
+        func = (...rest) => {
+          vu.send(act.end.apply(act, rest));
+        }
+      }
+      if (func){
+        cli.context[action.command] = func;
       }
     })
   }

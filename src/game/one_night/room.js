@@ -76,19 +76,19 @@ class Room extends room.Room {
     commonFunc[code.action.common.vote] = this.common_vote.bind(this);
   }
 
-  join(user, params) {
+  onjoin(user, params) {
     if (this.inGame){
       return false;
     }
+    return true;
     return super.join(user, params);
   }
 
-  leave(user) {
-    super.leave(user);
+  onleave(user) {
     if (this.inGame){
       setImmediate(() => {
         clearTimeout(this.nextTimeout);
-        this.end();
+        this.over();
       })
     }
   }
@@ -407,16 +407,16 @@ class Room extends room.Room {
       this.broadcast(step.afterVote.end(code.role.hunter, hunterName));
 
       this.nextTimeout = setTimeout(() => {
-        this.end();
+        this.over();
       }, this.intervalTime);
     }else{
       setImmediate(() => {
-        this.end();
+        this.over();
       })
     }
   }
 
-  end(){
+  over(){
     this.step = code.step.over;
     let success = [];
     let currentMap = {};
@@ -479,8 +479,7 @@ class Room extends room.Room {
     this.inGame = false;
   }
 
-  onmessage(user, act){
-    super.onmessage(user, act);
+  gameMessage(user, act){
     if (this.inGame){
       let funcSet = this.roleMap[act.role] || {};
       let func = funcSet[act.action];
@@ -489,7 +488,6 @@ class Room extends room.Room {
       }
     }
   }
-
 }
 Room.prototype.name = 'one_night';
 

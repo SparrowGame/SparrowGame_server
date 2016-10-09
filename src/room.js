@@ -58,8 +58,15 @@ class Room {
     }
   }
 
+  onjoin(user, params) {
+    return true;
+  }
+
   // return false to reject
   join(user, params) {
+    if (!this.onjoin(user, params)){
+      return false;
+    }
     if (!!this.users[user.name]){
       return false;
     }
@@ -75,10 +82,13 @@ class Room {
     return true;
   }
 
+  onleave(user) {}
+
   leave(user) {
     user.removeListener('close', this.bindedFunc.leave);
     user.removeListener('message_obj', this.bindedFunc.onmessage);
     delete this.users[user.name];
+    this.onleave(user);
   }
 
   exchange(target, user, params) {
@@ -95,6 +105,8 @@ class Room {
   }
 
   start () {}
+
+  gameMessage(user, act) {}
 
   onmessage(user, act){
     let funcSet = this.funcMap[act.type] || {};
