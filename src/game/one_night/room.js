@@ -105,7 +105,7 @@ class Room extends room.Room {
     if (this.wolf_watched){
       return user.send(sender.end(-2));
     }
-    if (!act.index || typeof act.index != 'number' || act.index >= 3 || act.index <= 0){
+    if (!act.hasOwnProperty('index') || typeof act.index != 'number' || act.index >= 3 || act.index < 0){
       return user.send(sender.end(-3));
     }
     this.wolf_watched = true;
@@ -398,6 +398,8 @@ class Room extends room.Room {
         hunterDie = true;
         hunterName = deadMan;
       }
+    }else{
+      this.voted = null;
     }
     if (hunterDie){
       this.step = code.step.afterVote;
@@ -408,7 +410,9 @@ class Room extends room.Room {
         this.end();
       }, this.intervalTime);
     }else{
-      this.end();
+      setImmediate(() => {
+        this.end();
+      })
     }
   }
 
@@ -439,11 +443,7 @@ class Room extends room.Room {
       }
     }else{
       // 死的不是疯子，还没有狼，则所有人的胜利条件是没有死人
-      let count = 0;
-      for (let name in this.die){
-        count++;
-      }
-      if (count == 0){
+      if (!this.voted){
         for (let name in this.current){
           success.push(name);
         }

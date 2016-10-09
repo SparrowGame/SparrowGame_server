@@ -73,6 +73,12 @@ function createCommonReceiver(vu){
       `当前玩家：\t${act.roomInfo.users.join()}` +
       ""
     )
+    let result = vu.loadGame(act.roomInfo.roomType);
+    if (!result){
+      vu.log(`无法载入游戏 ${act.roomInfo.roomType}，可能需要手动发送命令\n`);
+    }else{
+      vu.log(`自动载入游戏 ${act.roomInfo.roomType} 相关命令`);
+    }
   }
   feedbackSolvers[code.feedback.exit_room] = (user, act) => {
     if (act.code == -2){
@@ -115,9 +121,7 @@ function createCommonReceiver(vu){
         solver(user, act);
       }
     },
-    message: (user, msg) => {
-      vu.log("Pure Message: msg");
-    },
+    message: (user, msg) => {},
   }
 }
 
@@ -140,7 +144,7 @@ function createCLI(vu){
   }
   cli.context.info = vu.info;
   cli.addActions(commonActions);
-  cli.receiver = [createCommonReceiver(this)];
+  vu.addReceiver('common', createCommonReceiver(vu));
 
   cli.defineCommand("showSend", {
     help: '显示发送的数据包',
@@ -173,21 +177,7 @@ function createCLI(vu){
   cli.defineCommand("game", {
     help: '载入游戏的指令',
     action: (name) => {
-      let actions = []
-      let createReceiver = null;
-      if (!name){
-        actions = commonActions;
-      }else if (game.module[name]) {
-        let gameModule = game.module[name];
-        actions = gameModule.actions || [];
-        createReceiver = gameModule.createReceiver;
-      }
-      cli.addActions(actions);
-      if (createReceiver){
-        let receiver = createReceiver(self);
-        cli.receiver.push(receiver);
-        vu.addReceiver(receiver);
-      }
+      vu.loadGame(name);
       cli.displayPrompt();
     }
   })
@@ -199,11 +189,11 @@ function createCLI(vu){
       if (vu.client) vu.client.close();
       let ws = new WebSocket(url);
       ws.on('open', () => {
-        self.log(`successully connect to ${url}`);
+        vu.log(`连接 ${url} 成功`);
         vu.client = ws;
       })
       ws.on('close', () => {
-        super.close();
+        vu.close();
         vu.client = null;
         vu.log("远程服务器断开了连接");
       })
@@ -230,26 +220,15 @@ function createCLI(vu){
   cli.defineCommand("show", {
     help: "查看游戏指令，未指定则显示共有指令",
     action: (name) => {
-      let actions = [];
-      if (game.module[name]) {
-        actions = game.module[name].actions || [];
-      }else{
-        actions = commonActions;
-        name = '共有';
-      }
-
-      console.log(`${name}指令`)
-      actions.forEach((action) => {
-        let args = action.args || [];
-        let argNames = args.map((arg) => {
-          return arg.name;
-        })
-        console.log(`${action.command}(${argNames.join()})\t${action.comment}`);
-      })
+      vu.showActions(name);
       cli.displayPrompt();
     }
   })
-  cli.on('exit', () => super.close());
+  cli.on('exit', () => vu.close());
+  cli.log = (...rest) => {
+    console.log.apply(console, rest);
+    cli.displayPrompt();
+  }
   return cli;
 }
 
@@ -257,14 +236,14 @@ class VirtualUser extends user.User {
 
   constructor() {
     if (!super()) return;
-    let self = this;
     this.info = {};
     this.config = {
       displaySend: false,
       displayRecv: false,
     };
     this.client = null;
-    this.cli = createCLI(vu);
+    this.receiver = {};
+    this.cli = createCLI(this);
   }
 
   send_msg(msg) {
@@ -278,14 +257,60 @@ class VirtualUser extends user.User {
     this.client.send(msg);
   }
 
-  addReceiver(receiver){
+  addReceiver(name, receiver){
+    let origin = this.receiver[name];
+    if (origin){
+      this.removeListener('message_obj', origin.object);
+      this.removeListener('message', origin.object);
+    }
+    this.receiver[name] = receiver;
     receiver.object && this.on('message_obj', receiver.object);
     receiver.message && this.on('message', receiver.message);
   }
 
   log(...rest) {
-    console.log.apply(console, rest);
-    this.cli.displayPrompt();
+    this.cli.log.apply(this.cli, rest);
+  }
+
+  showActions(name) {
+    let actions = [];
+    let gameModule = game.module[name];
+    if (gameModule) {
+      actions = gameModule.actions || [];
+      if (gameModule.prompt){
+        name += ' ' + gameModule.prompt
+      }
+    }else{
+      actions = commonActions;
+      name = '共有';
+    }
+
+    console.log(`${name} 指令`)
+    actions.forEach((action) => {
+      let args = action.args || [];
+      let argNames = args.map((arg) => {
+        return arg.name;
+      })
+      console.log(`${action.command}(${argNames.join()})\t${action.comment}`);
+    })
+  }
+
+  loadGame(name) {
+    let actions = [];
+    let createReceiver = null;
+    let gameModule = game.module[name];
+    if (!name || !gameModule){
+      return false;
+    }
+    actions = gameModule.actions || [];
+    createReceiver = gameModule.createReceiver;
+
+    this.cli.addActions(actions);
+    this.showActions(name);
+    if (createReceiver){
+      this.addReceiver(name, createReceiver(vu));
+    }
+    return true;
   }
 }
 
