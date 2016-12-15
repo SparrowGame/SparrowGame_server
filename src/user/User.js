@@ -3,19 +3,24 @@
 const events = require("events");
 
 const nameBucket = require("./nameBucket.js");
-const room = require("./room.js");
-const packet = require("./packet.js");
-const code = require("./code.js");
+const packet = require("../packet.js");
+const code = require("../game/common/code.js");
 const loginInfo = packet.need('type', 'status', 'name')
                         .solve(code.type.info, code.info.user_login);
+
+var MainRoom = null;
 
 class User extends events.EventEmitter {
   static onmessage(user, act){
     console.log(act);
   }
 
+  static linkToMainRoom(room){
+    MainRoom = room;
+  }
+
   static joinMain(user){
-    if (!room.main.join(user)){
+    if (!MainRoom || !MainRoom.join(user)){
       return user.close();
     }
     user.send(loginInfo.end(user.name));
@@ -59,33 +64,6 @@ class User extends events.EventEmitter {
   }
 }
 
-class WebSocketUser extends User {
-  static onWSConnection(ws, req) {
-    let user = new WebSocketUser(ws);
-    User.joinMain(user);
-  }
-
-  constructor(ws) {
-    if (!super()){
-      ws.close();
-      return;
-    }
-    this.ws = ws;
-    ws.on('message', this.process.bind(this));
-    ws.on('close', () => super.close());
-  }
-
-  send_msg(msg) {
-    this.ws.send(msg);
-  }
-
-  close(){
-    super.close();
-    this.ws.close();
-  }
-}
-
 export {
   User,
-  WebSocketUser
 }

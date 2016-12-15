@@ -2,7 +2,7 @@
 
 const crypto = require('crypto');
 
-const packet = require('./packet.js');
+const packet = require('../../packet.js');
 const code = require('./code.js');
 
 const serverBase = packet.need('type', 'status');
@@ -177,7 +177,7 @@ class MainRoom extends Room{
   }
 
   control_create_room(user, act){
-    const game = require("./game");
+    const game = require("../../game");
     let roomId = MainRoom.getNewRoomId();
     let gameModule = game.module[act.roomType] || game.first;
     let room = new gameModule.Room(user, roomId);
@@ -206,5 +206,3 @@ export {
   Room,
   main
 }
-
-require("./game");

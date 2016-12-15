@@ -8,10 +8,13 @@ let module = {};
 let first = null;
 let size = 0;
 
+var common = require('./common');
+
 var files = glob.sync(`${__dirname}/*`)
 files.forEach((file) => {
   if (fs.lstatSync(file).isDirectory()){
     let gameName = path.basename(file);
+    if (gameName == 'common') return;
     try{
       let game = require(file);
       module[game.name] = game;
@@ -31,5 +34,6 @@ console.log(`默认游戏为: ${first.name} - ${first.prompt}`);
 
 export {
   module,
-  first
+  first,
+  common,
 }
