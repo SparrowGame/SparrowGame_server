@@ -1,0 +1,51 @@
+{
+  "name": "sparrow_game_server",
+  "version": "0.0.0",
+  "description": "the server of Sparrow Game",
+  "main": "./SparrowGame/app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "babel": {
+    "presets": [
+      "es2015", "stage-3"
+    ]
+  },
+  "scripts": {
+    "client": "babel-node src/client.js",
+    "start": "babel-node src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SparrowGame/SparrowGame_server.git"
+  },
+  "keywords": [
+    "game"
+  ],
+  "author": "lmzqwer2",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SparrowGame/SparrowGame_server/issues"
+  },
+  "homepage": "https://github.com/SparrowGame/SparrowGame_server#readme",
+  "devDependencies": {
+    "babel-cli": "^6.16.0",
+    "babel-core": "^6.16.0",
+    "babel-eslint": "^7.0.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.16.0",
+    "babel-preset-react": "^6.16.0",
+    "node-sass": "^3.10.1",
+    "sass-lint": "^1.9.1",
+    "sass-loader": "^4.0.2",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.2"
+  },
+  "dependencies": {
+    "babel-preset-stage-3": "^6.17.0",
+    "bluebird": "^3.4.6",
+    "express": "^4.14.0",
+    "express-ws": "^2.0.0"
+  }
+}
