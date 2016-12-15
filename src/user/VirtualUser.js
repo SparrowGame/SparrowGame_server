@@ -3,9 +3,11 @@
 const game = require('../game');
 const user = require('./User.js');
 
+const commonActions = require('../game').common.actions;
+
 class VirtualUser extends user.User {
-  constructor(name) {
-    if (!super(name)) return;
+  constructor() {
+    if (!super()) return;
     this.info = {};
     this.receiver = {};
   }
@@ -48,14 +50,16 @@ class VirtualUser extends user.User {
       name = '共有';
     }
 
-    this.log(`${name} 指令`)
+    let message = []
+    message.push(`${name} 指令`)
     actions.forEach((action) => {
       let args = action.args || [];
       let argNames = args.map((arg) => {
         return arg.name;
       })
-      this.log(`${action.command}(${argNames.join()})\t${action.comment}`);
+      message.push(`${action.command}(${argNames.join()})\t${action.comment}`);
     })
+    this.log(message.join('\n'));
   }
 
   loadGame(name) {
