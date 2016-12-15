@@ -3,10 +3,9 @@
 const repl = require('repl');
 const WebSocket = require('ws');
 
-const game = require('../game');
-const user = require('./User.js');
+const VirtualUser = require('./VirtualUser.js').VirtualUser;
 
-const common = game.common;
+const common = require('../game').common;
 const createCommonReceiver = common.createReceiver;
 const commonActions = common.actions;
 
@@ -131,16 +130,14 @@ function createCLI(vu){
   return cli;
 }
 
-class CommandLineUser extends user.User {
+class CommandLineUser extends VirtualUser {
   constructor() {
     if (!super()) return;
-    this.info = {};
     this.config = {
       displaySend: false,
       displayRecv: false,
     };
     this.client = null;
-    this.receiver = {};
     this.cli = createCLI(this);
   }
 
@@ -155,60 +152,12 @@ class CommandLineUser extends user.User {
     this.client.send(msg);
   }
 
-  addReceiver(receiver){
-    if (this.receiver){
-      let old = this.receiver;
-      old.object && this.removeListener('message_obj', old.object);
-      old.message && this.removeListener('message', old.message);
-    }
-    this.receiver = receiver;
-    receiver.object && this.on('message_obj', receiver.object);
-    receiver.message && this.on('message', receiver.message);
+  addActions(actions){
+    this.cli.addActions(actions);
   }
 
   log(...rest) {
     this.cli.log.apply(this.cli, rest);
-  }
-
-  showActions(name) {
-    let actions = [];
-    let gameModule = game.module[name];
-    if (gameModule) {
-      actions = gameModule.actions || [];
-      if (gameModule.prompt){
-        name += ' ' + gameModule.prompt
-      }
-    }else{
-      actions = commonActions;
-      name = '共有';
-    }
-
-    console.log(`${name} 指令`)
-    actions.forEach((action) => {
-      let args = action.args || [];
-      let argNames = args.map((arg) => {
-        return arg.name;
-      })
-      console.log(`${action.command}(${argNames.join()})\t${action.comment}`);
-    })
-  }
-
-  loadGame(name) {
-    let actions = [];
-    let createReceiver = null;
-    let gameModule = game.module[name];
-    if (!name || !gameModule){
-      return false;
-    }
-    actions = gameModule.actions || [];
-    createReceiver = gameModule.createReceiver;
-
-    this.cli.addActions(actions);
-    this.showActions(name);
-    if (createReceiver){
-      this.addReceiver(createReceiver(this));
-    }
-    return true;
   }
 }
 

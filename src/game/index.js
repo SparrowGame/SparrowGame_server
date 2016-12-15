@@ -8,9 +8,9 @@ let module = {};
 let first = null;
 let size = 0;
 
-var common = require('./common');
+let common = require('./common');
 
-var files = glob.sync(`${__dirname}/*`)
+let files = glob.sync(`${__dirname}/*`)
 files.forEach((file) => {
   if (fs.lstatSync(file).isDirectory()){
     let gameName = path.basename(file);

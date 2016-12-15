@@ -261,7 +261,7 @@ class Room extends room.Room {
       roles.splice(index, 1);
     }
 
-    this.broadcast(step.begin.end(), {}, send);
+    this.broadcast(step.begin.end(), send);
 
     this.inGame = true;
     this.vote = {};
@@ -309,7 +309,7 @@ class Room extends room.Room {
         wolf: wolfName,
       }
     }
-    this.broadcast(step.night.end(this.role), {}, send);
+    this.broadcast(step.night.end(this.role), send);
 
     this.nextTimeout = setTimeout(() => {
       this.night_seer();
@@ -356,7 +356,7 @@ class Room extends room.Room {
         selfRole: this.current[witchName],
       }
     }
-    this.broadcast(step.night.end(this.role), {}, send);
+    this.broadcast(step.night.end(this.role), send);
 
     this.nextTimeout = setTimeout(() => {
       this.morning();

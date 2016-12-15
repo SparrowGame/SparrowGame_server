@@ -2,7 +2,7 @@
 
 const crypto = require('crypto');
 
-const packet = require('../../packet.js');
+const packet = require('./packet.js');
 const code = require('./code.js');
 
 const serverBase = packet.need('type', 'status');
@@ -41,8 +41,14 @@ class Room {
     this.admin = user;
   }
 
-  broadcast(obj, addition={}) {
+  broadcast(obj, exclude={}, addition={}) {
+    if (exclude instanceof Array){
+      let res = {}
+      exclude.forEach((ex) => res[ex] = true);
+      exclude = res;
+    }
     for (let name in this.users){
+      if (!!exclude[name]) continue;
       let res = Object.assign({}, obj);
       let add = addition[name];
       if (add) {
@@ -161,10 +167,7 @@ class MainRoom extends Room{
       return;
     }
     let users = [];
-    for (let name in room.users) {
-      if (name != user.name)
-        users.push(name);
-    }
+    for (let name in room.users) users.push(name);
     user.send(feedback.enter_room.end(0, {
       roomId: roomId,
       roomType: room.name,
@@ -174,7 +177,7 @@ class MainRoom extends Room{
   }
 
   control_create_room(user, act){
-    const game = require("../../game");
+    const game = require("./game");
     let roomId = MainRoom.getNewRoomId();
     let gameModule = game.module[act.roomType] || game.first;
     let room = new gameModule.Room(user, roomId);
@@ -203,3 +206,5 @@ export {
   Room,
   main
 }
+
+require("./game");

@@ -8,7 +8,7 @@ const code = require("../game/common/code.js");
 const loginInfo = packet.need('type', 'status', 'name')
                         .solve(code.type.info, code.info.user_login);
 
-var MainRoom = null;
+let MainRoom = null;
 
 class User extends events.EventEmitter {
   static onmessage(user, act){
@@ -26,10 +26,16 @@ class User extends events.EventEmitter {
     user.send(loginInfo.end(user.name));
   }
 
-  constructor() {
+  constructor(name) {
     super();
 
-    this.name = nameBucket.getUnused();
+    if (name){
+      this.name = name;
+      this.useNameBucket = true;
+    }else{
+      this.name = nameBucket.getUnused();
+      this.useNameBucket = false;
+    }
     if (!this.name.length) return;
   }
 
@@ -60,6 +66,7 @@ class User extends events.EventEmitter {
   }
 
   close() {
+    if (this.useNameBucket) nameBucket.unuse(this.name);
     this.emit("close", this);
   }
 }
