@@ -20,7 +20,7 @@ class TelegramVirtualUser extends VirtualUser {
     }
     let user = users[msg.from.id];
     if (!user){
-      user = new TelegramUser(msg.from.id, msg.from.username)
+      user = new TelegramVirtualUser(msg.from.id, msg.from.username)
     }
     user.receive_msg(msg.text);
   }
@@ -73,7 +73,7 @@ class TelegramVirtualUser extends VirtualUser {
   }
 
   addActions(actions){
-    actions.each((act) => {
+    actions.forEach((act) => {
       this.actions[act.command] = act;
     })
   }
@@ -81,6 +81,14 @@ class TelegramVirtualUser extends VirtualUser {
   log(...rest) {
     TelegramBot.sendMessage(this.telegram.uid, rest.join(' '))
   }
+
+  close(){
+    this.telegram.realUser.close();
+  }
 }
 
-TelegramBot.on('text', TelegramUser.onTelegramConnection);
+TelegramBot.on('text', TelegramVirtualUser.onTelegramConnection);
+
+export {
+  TelegramVirtualUser,
+}

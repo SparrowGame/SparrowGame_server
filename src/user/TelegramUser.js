@@ -7,7 +7,7 @@ class TelegramUser extends User {
     if (!super(name)) return;
     this.telegram = {}
     this.telegram.vu = telegramVu;
-    User.joinMain(user)
+    User.joinMain(this)
   }
 
   send_msg(msg){

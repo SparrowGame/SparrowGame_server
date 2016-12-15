@@ -23,8 +23,9 @@ function createReceiver(vu){
     if (act.code == -2){
       return vu.log("无法加入目标房间");
     }
+    let message = []
     vu.info.room = act.roomInfo;
-    vu.log(
+    message.push(
       "加入房间成功\n" +
       `房间号：\t${act.roomInfo.roomId}\n` +
       `房间类型：\t${act.roomInfo.roomType}\n` +
@@ -33,10 +34,11 @@ function createReceiver(vu){
     )
     let result = vu.loadGame(act.roomInfo.roomType);
     if (!result){
-      vu.log(`无法载入游戏 ${act.roomInfo.roomType}，可能需要手动发送命令\n`);
+      message.push(`无法载入游戏 ${act.roomInfo.roomType}，可能需要手动发送命令\n`);
     }else{
-      vu.log(`自动载入游戏 ${act.roomInfo.roomType} 相关命令`);
+      message.push(`自动载入游戏 ${act.roomInfo.roomType} 相关命令`);
     }
+    vu.log(message.join('\n'));
   }
   feedbackSolvers[code.feedback.exit_room] = (user, act) => {
     if (act.code == -2){
