@@ -4,6 +4,11 @@ const VirtualUser = require('./VirtualUser.js').VirtualUser;
 const TelegramBot = require('./TelegramBot.js').bot;
 
 const users = {};
+const packet = require('../packet.js');
+
+const common = require('../game').common;
+const createCommonReceiver = common.createReceiver;
+const commonActions = common.actions;
 
 class TelegramUser extends VirtualUser {
   static onTelegramConnection(msg){
@@ -11,15 +16,16 @@ class TelegramUser extends VirtualUser {
       // TODO, group user
       return;
     }
-    user = new TelegramUser(msg.from.id, msg.from.username);
+    let user = users[msg.from.id];
+    if (!user){
+      user = new TelegramUser(msg.from.id, msg.from.username)
+    }
     user.send_msg(msg.text);
   }
 
   constructor(id, name) {
-    if (users[id]){
-      return users[id];
-    }
     if (!super(name)) return;
+    this.telegram = {};
     this.telegram.uid = id;
     this.actions = {
       showActions: {
@@ -30,13 +36,17 @@ class TelegramUser extends VirtualUser {
         comment: "查看命令",
       }
     }
+    this.addActions(commonActions);
+    let receiver = createCommonReceiver(this);
+    receiver.object && this.on('message_obj', receiver.object);
+    receiver.message && this.on('message', receiver.message);
     users[id] = this;
   }
 
   send_msg(msg) {
     let argv = msg.split(' ');
     let cmd = argv.shift();
-    let action = this.actions[name];
+    let act = this.actions[cmd];
     let func = null;
     if (typeof act == 'function'){
       func = (...rest) => {

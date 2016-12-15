@@ -31,10 +31,10 @@ class User extends events.EventEmitter {
 
     if (name){
       this.name = name;
-      this.useNameBucket = true;
+      this.useNameBucket = false;
     }else{
       this.name = nameBucket.getUnused();
-      this.useNameBucket = false;
+      this.useNameBucket = true;
     }
     if (!this.name.length) return;
   }
