@@ -104,12 +104,12 @@ class Room extends room.Room {
     if (this.wolf_watched){
       return user.send(sender.end(-2));
     }
-    if (!act.hasOwnProperty('index') || typeof act.index != 'number' || act.index >= 3 || act.index < 0){
+    let index = parseInt(act.index);
+    if (isNaN(index) || index >= 3 || index < 0){
       return user.send(sender.end(-3));
     }
     this.wolf_watched = true;
 
-    let index = act.index;
     user.send(sender.end(0, this.unused[index].role));
   }
 
