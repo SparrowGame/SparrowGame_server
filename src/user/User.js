@@ -26,6 +26,8 @@ class User extends events.EventEmitter {
     user.send(loginInfo.end(user.name));
   }
 
+  static listen(channel){}
+
   constructor(name) {
     super();
 

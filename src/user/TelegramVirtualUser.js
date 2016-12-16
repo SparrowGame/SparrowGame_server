@@ -2,7 +2,6 @@
 
 const User = require('./User.js').User;
 const VirtualUser = require('./VirtualUser.js').VirtualUser;
-const TelegramBot = require('./TelegramBot.js').bot;
 const TelegramUser = require('./TelegramUser.js').TelegramUser;
 
 const users = {};
@@ -11,6 +10,8 @@ const packet = require('../packet.js');
 const common = require('../game').common;
 const createCommonReceiver = common.createReceiver;
 const commonActions = common.actions;
+
+let TelegramBot = null;
 
 class TelegramVirtualUser extends VirtualUser {
   static onTelegramConnection(msg){
@@ -23,6 +24,11 @@ class TelegramVirtualUser extends VirtualUser {
       user = new TelegramVirtualUser(msg.from.id, msg.from.username)
     }
     user.receive_msg(msg.text);
+  }
+
+  static listen(channel){
+    TelegramBot = channel.bot;
+    TelegramBot.on('text', TelegramVirtualUser.onTelegramConnection)
   }
 
   constructor(id, name) {
@@ -86,8 +92,6 @@ class TelegramVirtualUser extends VirtualUser {
     this.telegram.realUser.close();
   }
 }
-
-TelegramBot.on('text', TelegramVirtualUser.onTelegramConnection);
 
 export {
   TelegramVirtualUser,
