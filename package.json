@@ -14,7 +14,7 @@
   },
   "scripts": {
     "client": "CLIENT=true babel-node src/client.js",
-    "start": "babel-node src/app.js",
+    "start": "CONFIG=online babel-node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
