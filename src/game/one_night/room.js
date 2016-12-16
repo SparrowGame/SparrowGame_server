@@ -80,6 +80,9 @@ class Room extends room.Room {
     if (this.inGame){
       return false;
     }
+    if (this.userCount() >= 5){
+      return false;
+    }
     return true;
   }
 
@@ -221,11 +224,7 @@ class Room extends room.Room {
   }
 
   start_check(params) {
-    let count = 0;
-    for (let name in this.users){
-      count++;
-    }
-    if (count != 5) return false;
+    if (this.userCount() != 5) return false;
     if (this.inGame) return false;
     return true;
   }

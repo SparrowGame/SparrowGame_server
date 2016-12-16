@@ -1,5 +1,4 @@
 'use strict';
-'use strict';
 
 const room = require('../common/room.js');
 const packet = require('../../packet.js');

@@ -26,6 +26,7 @@ class Room {
   constructor(user, id) {
     if (!!roomSet[id]) return;
 
+    this.group = null;
     this.id = id;
     roomSet[id] = this;
     this.users = {};
@@ -50,6 +51,12 @@ class Room {
       }
       this.users[name].send(res);
     }
+  }
+
+  userCount(){
+    let count = 0;
+    for (name in this.users) count++;
+    return count;
   }
 
   onjoin(user, params) {

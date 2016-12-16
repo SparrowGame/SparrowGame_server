@@ -5,3 +5,4 @@ global.ROOT = __dirname;
 global.isProduction = (process.env.NODE_ENV === 'production');
 global.isClient = (!!process.env.CLIENT);
 global.isDEBUG = (!!process.env.DEBUG);
+global.config = require(`./config/${process.env.CONFIG}.js`).config;

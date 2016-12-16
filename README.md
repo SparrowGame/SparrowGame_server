@@ -6,10 +6,10 @@ Sparrow Game正如其名，麻雀虽小五脏俱全。
 
 ## 服务端
 
-1. npm -i 安装依赖
+1. npm i 安装依赖
 2. npm start 启动
 
-启动后默认在3000端口。WebSocket连接地址为 http://host/user
+启动后默认在3000端口。WebSocket连接地址为 ws://host/user
 
 ## 客户端
 
